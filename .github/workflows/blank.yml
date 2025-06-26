@@ -1,17 +1,25 @@
-def barrett_reduce(x, N, mu=None, k=None):
-    if mu is None or k is None:
-        k = N.nbits() + 1
-        mu = (1 << (2 * k)) // N
-    q = (x * mu) >> (2 * k)
+import time
+
+def barrett_reduce(x, N, mu, k):   
+    q = (x * mu) >> k  
     r = x - q * N
+    
     while r >= N:
         r -= N
     return r
 
-# Пример
-N = 10^9 + 7
-x = 1234567890123456789
-mu, k = (1 << (2 * (N.nbits() + 1))) // N, N.nbits() + 1
+N = 2^50-1
+x = 2^125
+k = N.nbits()  
+mu = (1 << k) // N  
 
-print(x % N)                     # Встроенный метод
-print(barrett_reduce(x, N, mu, k))  # алгоритм
+start = time.time()
+res1 = x % N
+t1 = time.time() - start
+
+start = time.time()
+res2 = barrett_reduce(x, N, mu, k)
+t2 = time.time() - start
+if (res1==res2):
+    print(f"%: {t1:.6f} sec")
+    print(f"Barrett:{t2:.6f} sec")
