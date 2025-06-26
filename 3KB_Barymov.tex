@@ -1,0 +1,327 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode} 
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+\usepackage{geometry}
+\usepackage{listings}
+\usepackage{xcolor}
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+
+\lstset{
+    basicstyle=\ttfamily\small,       
+    keywordstyle=\color{blue},        
+    commentstyle=\color{green},       
+    numbers=left,                     
+    frame=single,                     
+    breaklines=true,                  
+    showstringspaces=false,           
+    tabsize=4,                        
+    numberstyle=\tiny\color{gray},    
+    captionpos=t                      
+}
+
+\lstset{style=mystyle}
+\geometry{
+    a4paper,
+    left=30mm,
+    right=15mm,
+    top=20mm,
+    bottom=20mm
+}
+
+% PROBABILITY SYMBOLS
+\newcommand*\PROB\Pr 
+\DeclareMathOperator*{\EXPECT}{\mathbb{E}}
+
+% Sets, Rngs, ets 
+\newcommand{\N}{{{\mathbb N}}}
+\newcommand{\Z}{{{\mathbb Z}}}
+\newcommand{\R}{{{\mathbb R}}}
+\newcommand{\Zp}{\ints_p} % Integers modulo p
+\newcommand{\Zq}{\ints_q} % Integers modulo q
+\newcommand{\Zn}{\ints_N} % Integers modulo N
+
+% Landau 
+\newcommand{\bigO}{\mathcal{O}}
+\newcommand*{\OLandau}{\bigO}
+\newcommand*{\WLandau}{\Omega}
+\newcommand*{\xOLandau}{\widetilde{\OLandau}}
+\newcommand*{\xWLandau}{\widetilde{\WLandau}}
+\newcommand*{\TLandau}{\Theta}
+\newcommand*{\xTLandau}{\widetilde{\TLandau}}
+\newcommand{\smallo}{o} %technically, an omicron
+\newcommand{\softO}{\widetilde{\bigO}}
+\newcommand{\wLandau}{\omega}
+\newcommand{\negl}{\mathrm{negl}} 
+
+% Misc
+\newcommand{\eps}{\varepsilon}
+\newcommand{\inprod}[1]{\left\langle #1 \right\rangle}
+
+\newcommand{\handout}[5]{
+  \noindent
+  \begin{center}
+  \framebox{
+    \vbox{
+      \hbox to 5.78in { {\bf Учебная практика (учебно-
+лабораторная)} \hfill #2 }
+      \vspace{4mm}
+      \hbox to 5.78in { {\Large \hfill #5  \hfill} }
+      \vspace{2mm}
+      \hbox to 5.78in { {\em #3 \hfill #4} }
+    }
+  }
+  \end{center}
+  \vspace*{4mm}
+}
+
+\newcommand{\lecture}[4]{\handout{#1}{#2}{#3}{Автор: #4}{Название темы #1}}
+
+\newtheorem{theorem}{Теорема}
+\newtheorem{lemma}{Лемма}
+\newtheorem{definition}{Определение}
+\newtheorem{corollary}{Следствие}
+\newtheorem{fact}{Факт}
+
+\begin{document}
+
+\begin{titlepage}
+    \centering
+    % Название министерства
+    {\large\textbf{Федеральное государственное автономное образовательное учреждение высшего образования}}\par
+    \vspace{0.5cm}
+    % Название университета
+    {\large\textbf{Балтийский федеральный университет имени Иммануила Канта}}\par
+    \vspace{0.5cm}
+    
+    % Институт
+    {\large Высшая школа компьютерных наук и искусственного интеллекта}\par
+    \vspace{3cm}
+    
+    % Тип работы
+    {\Large\textbf{ОТЧЕТ}}\par
+    \vspace{1cm}
+    
+    % Название работы
+    {\Large по учебной практике (учебно-лабораторной)}\par
+    \vspace{2cm}
+    
+    % Информация о студенте (выровнено по правому краю)
+    \begin{flushright}
+        \large
+        \textbf{Выполнил:}\par
+        студент \underline{Барымов И.А.}\par
+        \vspace{0.5cm}
+        группы \underline{05-КБ-22-О}\par
+        \vspace{0.5cm}
+        направление подготовки 10.05.01 <<Компьютерная безопасность>>\par
+        \vspace{2cm}
+        
+        \textbf{Руководитель практики:}\par
+        ст. преподаватель \underline{Глинчиков К.Е.}\par
+        \vspace{2cm}
+    \end{flushright}
+    
+    % Подписи и дата 
+    \begin{flushright}
+        Работа выполнена:  <<\underline{\hspace{1cm}}>> \underline{\hspace{3cm}} 2025 г.\par
+        \vspace{1cm}
+        Работа защищена с оценкой: \underline{\hspace{6cm}}\par
+        \vspace{1cm}
+        <<\underline{\hspace{1cm}}>> \underline{\hspace{3cm}} 2025 г.\par
+    \end{flushright}
+    
+    % Город и год
+    \vspace{2cm}
+    {\large Калининград 2025}
+\end{titlepage}
+
+\newpage
+
+\lecture{Алгоритм Барретта}{6 семестр 2025 г.}{}{Барымов И.А.}
+\section{Введение}
+\textbf{Алгоритм Барретта} - это алгоритм приведения, предназначенный для оптимизации вычисления выражения x mod N без использования быстрого алгоритма деления, заменяющий операции деления на умножения.
+
+\section{Алгоритм Барретта}
+
+\begin{algorithm}[ph]
+	\caption{Классическая модульная редукция по Барретту}
+	\label{alg:BarrettReduction}
+	\textbf{Вход:} $x$ - число для редукции , $N$ - модуль, \\
+	\quad \quad $\mu = \left\lfloor \frac{2^k}{N} \right\rfloor$ (предвычислено), $k = \lfloor \log_2 N \rfloor + 1$ \\
+	\textbf{Выход:} $x \mod N$
+	
+	\begin{algorithmic}[1]
+		\State $q \leftarrow \left\lfloor \frac{x \cdot \mu}{2^k} \right\rfloor$ \Comment{Приближение частного}
+		\State $r \leftarrow x - q \cdot N$ \Comment{Промежуточный остаток}
+		\While{$r \geq N$} \Comment{Корректировка}
+		    \State $r \leftarrow r - N$
+		\EndWhile
+		\State \Return $r$
+	\end{algorithmic}
+\end{algorithm}
+
+\section{Теоретическое обоснование}
+
+Для алгоритма верна следующая цепочка вычислений:
+\begin{enumerate}
+    \item \textbf{Константа:} 
+    \[\mu = \left\lfloor \frac{2^k}{N} \right\rfloor, \quad \text{где } k = \lfloor \log_2 N \rfloor + 1.\]
+    
+    \item \textbf{Частное:} 
+    \[q = \left\lfloor \frac{x \cdot \mu}{2^k} \right\rfloor.\]
+    
+    \item \textbf{Оценка:} 
+    \[q \leq \frac{x \cdot \mu}{2^k} \leq \frac{x \cdot (2^k / N)}{2^k} = \frac{x}{N}.\] 
+    
+    \item \textbf{Остаток:}
+    \[r = x - q \cdot N\ , \quad \text{где } r < 2N\]
+\end{enumerate}
+
+\begin{fact}
+Алгоритм возвращает корректный остаток $r = x \mod N$, причём:
+\begin{itemize}
+    \item Промежуточное значение $r$ удовлетворяет $0 \leq r < 2N$
+\end{itemize}
+\end{fact}
+
+\subsection{Доказательство}
+Из оценки для $q$ следует:
+\[ x - qN \geq x - \left(\frac{x}{N}\right)N = 0, \]
+а верхняя граница:
+\[ x - qN \leq x - \left(\frac{x \cdot \mu}{2^k} - 1\right)N < N + \frac{x}{2^k} \cdot (2^k - \mu N). \]
+Поскольку $\mu \geq \frac{2^k}{N} - 1$, то $r < 2N$.
+\subsection{Замечания}
+\begin{itemize}
+    \item Алгоритм особенно эффективен при многократных редукциях по одному модулю (например, в криптографии), так как $\mu$ вычисляется один раз.
+    \item Основное преимущество — замена деления на умножение и битовые операции, что намного быстрее на большинстве процессоров.
+\end{itemize}
+
+\section{Пример вычисления по алгоритму Барретта}
+
+Пусть:
+\begin{itemize}
+    \item Модуль $N = 17$
+    \item Число для редукции $x = 245$
+    \item Параметр $k = 5$ (так как $2^4 \leq N < 2^5$)
+\end{itemize}
+
+\subsection{Шаг 1: Предвычисление константы $\mu$}
+\[
+\mu = \left\lfloor \frac{2^{2k}}{N} \right\rfloor = \left\lfloor \frac{2^{10}}{17} \right\rfloor = \left\lfloor \frac{1024}{17} \right\rfloor = 60
+\]
+
+\subsection{Шаг 2: Вычисление приближённого частного $q$}
+\[
+q = \left\lfloor \frac{x \cdot \mu}{2^{2k}} \right\rfloor = \left\lfloor \frac{245 \times 60}{1024} \right\rfloor = \left\lfloor \frac{14700}{1024} \right\rfloor = 14
+\]
+
+\subsection{Шаг 3: Вычисление остатка $r$}
+\[
+r = x - q \cdot N = 245 - 14 \times 17 = 245 - 238 = 7
+\]
+
+\subsection{Шаг 4: Корректировка (ситуативно)}
+Так как $7 < 17$, коррекция не выполняется.
+
+\subsection{Результат}
+\[
+245 \mod 17 = 7 \quad \text{(верно, так как $17 \times 14 + 7 = 245$)}
+\]
+
+\section{Сравнение и тесты алгоритма со встроенной функцией Sage}
+
+
+Для сравнения эффективности реализации алгоритма Барретта со встроенной операцией модуля был проведён ряд тестов. Результаты представлены в таблице~\ref{tab:speed_comparison}.
+
+\begin{table}[h]
+\centering
+\caption{Сравнение времени работы алгоритмов (в секундах)}
+\label{tab:speed_comparison}
+\begin{tabular}{|c|c|c|c|}
+\hline
+\textbf{Размерность $N$} & \textbf{Алгоритм Барретта} & \textbf{Встроенная операция \%} & \textbf{Отношение} \\
+\hline
+110 бит & 0.000659 & 0.000183 & 0.000475 \\
+115 бит & 0.002742 & 0.000134 & 0.002607 \\
+120 бит & 0.158559 & 0.000117 & 0.158442 \\
+125 бит & 3.063338 & 0.000080 & 3.063258 \\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{itemize}
+\item Все тесты проводились на процессоре Intel Core i3-10100F
+\item Время приведено в секундах с точностью до 6 знаков после запятой
+\end{itemize}
+
+\subsection{Методика тестирования}
+Тестирование проводилось на следующей конфигурации:
+\begin{itemize}
+\item Процессор: Intel Core i3-10100F (3.6 GHz)
+\item Память: 16 ГБ DDR4
+\item ОС: Windows 10
+\item SageMathCell - десктопная версия браузерной ячейки
+\end{itemize}
+\newpage
+\subsection{Анализ результатов}
+
+Как видно из таблицы~\ref{tab:speed_comparison}:
+\begin{itemize}
+\item Встроенная функция SageMath работает сильно быстрее алгоритма Барретта(в силу оптимизации Sage)
+\item Разница в скорости растёт при увеличении размера входных данных
+\end{itemize}
+
+\begin{lstlisting}[language=Python,caption=Код для тестирования]
+import time
+
+def barrett_reduce(x, N, mu, k):   
+    q = (x * mu) >> k  
+    r = x - q * N
+    
+    while r >= N:
+        r -= N
+    return r
+
+N = 2^50-1
+x = 2^125
+k = N.nbits()  
+mu = (1 << k) // N  
+
+start = time.time()
+res1 = x % N
+t1 = time.time() - start
+
+start = time.time()
+res2 = barrett_reduce(x, N, mu, k)
+t2 = time.time() - start
+if (res1==res2):
+    print(f"%: {t1:.6f} sec")
+    print(f"Barrett:{t2:.6f} sec")
+\end{lstlisting}
+
+\section{Применение в криптографии}
+
+Алгоритм Барретта применяется в:
+
+\begin{itemize}
+\item Модульном возведении в степень в RSA и Диффи-Хеллмане
+\item Эллиптической криптографии (ECC)
+\item Постквантовой криптографии 
+\end{itemize}
+
+\newpage
+\begin{center}
+\paragraph{Список литературы}
+\end{center}
+
+\begin{enumerate}
+\item Barrett P. Implementing the Rivest Shamir and Adleman Public Key Encryption Algorithm on a Standard Digital Signal Processor // Advances in Cryptology - CRYPTO'86. - 1987. - P. 311-326.
+\item Панкратова И. А. - Теоретико-числовые методы в криптографии: учебное пособие. — 2009. — С. 12-13
+\end{enumerate}
+
+\end{document}
