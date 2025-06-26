@@ -1,0 +1,17 @@
+def barrett_reduce(x, N, mu=None, k=None):
+    if mu is None or k is None:
+        k = N.nbits() + 1
+        mu = (1 << (2 * k)) // N
+    q = (x * mu) >> (2 * k)
+    r = x - q * N
+    while r >= N:
+        r -= N
+    return r
+
+# Пример
+N = 10^9 + 7
+x = 1234567890123456789
+mu, k = (1 << (2 * (N.nbits() + 1))) // N, N.nbits() + 1
+
+print(x % N)                     # Встроенный метод
+print(barrett_reduce(x, N, mu, k))  # алгоритм
